@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Alert dialogs without xml"
+        android:text="HUD / Spinner dialog"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,16 +40,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:onClick="openYesNoDialog"
-                    android:text="Yes/No Dialog"
+                    android:onClick="showOnlySpinner"
+                    android:text="Simple spinner"
                     android:textSize="12sp"
                     tools:ignore="HardcodedText" />
 
-                <TextView
-                    android:id="@+id/tv_answer1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -60,16 +55,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:onClick="openTextInputDialog"
-                    android:text="Text input Dialog"
+                    android:onClick="showSpinnerWithText"
+                    android:text="Spinner with text"
                     android:textSize="12sp"
                     tools:ignore="HardcodedText" />
 
-                <TextView
-                    android:id="@+id/tv_answer2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -79,16 +69,23 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:onClick="openThreeOptionsDialog"
-                    android:text="Three options Dialog"
+                    android:onClick="showRedSpinner"
+                    android:text="Red SPINNER"
                     android:textSize="12sp"
                     tools:ignore="HardcodedText" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/tv_answer3"
+                <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"/>
+                    android:layout_marginStart="16dp"
+                    android:onClick="showMagentaSpinner"
+                    android:text="Magenta SPINNER"
+                    android:textSize="12sp"
+                    tools:ignore="HardcodedText" />
             </LinearLayout>
         </LinearLayout>
 

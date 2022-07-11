@@ -4,6 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.43874172185430466" />
+        <entry key="app/src/main/res/layout/iotec_hud_dialog.xml" value="0.2907608695652174" />
+        <entry key="app/src/main/res/layout/iotec_red_hud_dialog.xml" value="0.1" />
       </map>
     </option>
   </component>

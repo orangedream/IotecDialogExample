@@ -1,159 +1,97 @@
 package tw.iotec.dialogexample.util
 
 import android.app.AlertDialog
-import android.content.Context
-import android.widget.EditText
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import tw.iotec.dialogexample.R
+
 
 class IotecKotlinDialogUtil {
     companion object{
-        //************************************************************************************
-        // OK/Cancel Dialog using AlertDialog
-        //************************************************************************************
-        private var okCancelAlertDialog: AlertDialog? = null
+        //*******************************************************
+        // HUD dialog
+        //*******************************************************
+        private var hudProgressDialog: AlertDialog? = null
+        fun launchHUD(activity: AppCompatActivity, vararg message: String) {
+            activity.runOnUiThread {
+                hudProgressDialog?.dismiss() // dismiss previous dialog
 
-        interface ConfirmDialogCallback {
-            fun onResult(isOK: Boolean)
-        }
+                val builder = AlertDialog.Builder(activity, R.style.IotecSpinnerTheme)
+                val inflater: LayoutInflater = activity.layoutInflater
+                val contentView: View = inflater.inflate(R.layout.iotec_hud_dialog, null)
+                builder.setView(contentView)
+                val dialog =  builder.create()
+                dialog.setCancelable(false) // Block the UI
 
-        fun launchOkCancelAlertDialog(
-            context: Context,
-            title: String?,
-            message: String?,
-            okStr: String,
-            cancelStr: String?,
-            callback: ConfirmDialogCallback
-        ) {
-            okCancelAlertDialog?.dismiss() // dismiss previous dialog if exists
-
-            val alert = AlertDialog.Builder(context)
-            alert.setTitle(title)
-            alert.setMessage(message)
-
-            alert.setPositiveButton(
-                okStr
-            ) { _, _ ->
-                callback.onResult(true)
-                okCancelAlertDialog?.dismiss()
-                okCancelAlertDialog = null
-            }
-
-            if(cancelStr != null) {
-                alert.setNegativeButton(
-                    cancelStr
-                ) { _, _ ->
-                    callback.onResult(false)
-                    okCancelAlertDialog?.dismiss()
-                    okCancelAlertDialog = null
+                if (message.isNotEmpty()) {
+                    val textView = contentView.findViewById<TextView>(R.id.loading_msg)
+                    textView?.text = message[0]
                 }
-            }
 
-            okCancelAlertDialog = alert.create()
-            alert.show()
+                hudProgressDialog = dialog
+                dialog.show()
+            }
         }
 
-        //************************************************************************************
-        // OK/Cancel/text input TextDialog using AlertDialog
-        //************************************************************************************
-        private var textInputDialog: AlertDialog? = null
-
-
-        interface TextDialogCallback {
-            fun onTextInput(isOK: Boolean, inputText: String?)
+        fun dismissHUD(activity: AppCompatActivity) {
+            activity.runOnUiThread{
+                hudProgressDialog?.dismiss()
+                hudProgressDialog = null
+            }
         }
 
-        fun launchTextInputDialog(
-            context: Context,
-            title: String?,
-            defaultMessage: String?,
-            hint:String?,
-            okStr: String,
-            cancelStr: String?,
-            callback: TextDialogCallback
-        ) {
-            textInputDialog?.dismiss()
+        fun launchRedHUD(activity: AppCompatActivity, vararg message: String) {
+            activity.runOnUiThread {
+                hudProgressDialog?.dismiss() // dismiss previous dialog
 
-            val alert = AlertDialog.Builder(context)
-            alert.setTitle(title)
+                val builder = AlertDialog.Builder(activity, R.style.IotecSpinnerTheme)
+                val inflater: LayoutInflater = activity.layoutInflater
+                val contentView: View = inflater.inflate(R.layout.iotec_red_hud_dialog, null)
+                builder.setView(contentView)
+                val dialog =  builder.create()
+                dialog.setCancelable(false) // Block the UI
 
-            val edittext = EditText(context)
-            edittext.setText(defaultMessage)
-            edittext.hint = hint
-            alert.setView(edittext)
-
-            alert.setPositiveButton(okStr
-            ) { _, _ ->
-                val inputText = edittext.text.toString()
-                callback.onTextInput(true, inputText)
-                textInputDialog?.dismiss()
-                textInputDialog = null
-            }
-            if (cancelStr != null) {
-                alert.setNegativeButton(cancelStr
-                ) { _, _ ->
-                    callback.onTextInput(false, null)
-                    textInputDialog?.dismiss()
-                    textInputDialog = null
+                if (message.isNotEmpty()) {
+                    val textView = contentView.findViewById<TextView>(R.id.loading_msg)
+                    textView?.text = message[0]
                 }
+
+                hudProgressDialog = dialog
+                dialog.show()
             }
-            textInputDialog = alert.create()
-            textInputDialog?.show()
         }
+        fun launchHUDWithColor(activity: AppCompatActivity, message: String?, color:Int) {
+            activity.runOnUiThread {
+                hudProgressDialog?.dismiss() // dismiss previous dialog
 
-        //************************************************************************************
-        // Three options dialog using AlertDialog
-        //************************************************************************************
-        private var threeOptionDialog: AlertDialog? = null
-        enum class ThreeOptionsDialogSelection {
-            OPTION1, OPTION2, OPTION3
-        }
+                val builder = AlertDialog.Builder(activity, R.style.IotecSpinnerTheme)
+                val inflater: LayoutInflater = activity.layoutInflater
+                val contentView: View = inflater.inflate(R.layout.iotec_red_hud_dialog, null)
 
-        interface ThreeOptionDialogCallback {
-            fun onResult(option: ThreeOptionsDialogSelection)
-        }
+                val progressBar = contentView.findViewById<ProgressBar>(R.id.loader)
+                progressBar.indeterminateTintList = ColorStateList.valueOf(color)
+                progressBar.indeterminateTintMode = PorterDuff.Mode.SRC_IN
 
-        fun launchThreeOptionDialog(
-            context: Context,
-            title: String?,
-            message: String?,
-            option1: String,
-            option2: String?,
-            option3: String?, callback: ThreeOptionDialogCallback
-        ) {
-            threeOptionDialog?.dismiss()
+                builder.setView(contentView)
+                val dialog =  builder.create()
+                dialog.setCancelable(false) // Block the UI
 
-            val alert = AlertDialog.Builder(context)
-            alert.setTitle(title)
-            if (message != null) alert.setMessage(message)
-            alert.setPositiveButton(
-                option1
-            ) { _, _ ->
-                callback.onResult(ThreeOptionsDialogSelection.OPTION1)
-                threeOptionDialog?.dismiss()
-                threeOptionDialog = null
-            }
-
-            if(option2 != null) {
-                alert.setNegativeButton(
-                    option2
-                ) { _, _ ->
-                    callback.onResult(ThreeOptionsDialogSelection.OPTION2)
-                    threeOptionDialog?.dismiss()
-                    threeOptionDialog = null
+                message?.let{
+                    val textView = contentView.findViewById<TextView>(R.id.loading_msg)
+                    textView?.text = it
                 }
-            }
 
-            if(option3 != null) {
-                alert.setNeutralButton(
-                    option3
-                ) { _, _ ->
-                    callback.onResult(ThreeOptionsDialogSelection.OPTION3)
-                    threeOptionDialog?.dismiss()
-                    threeOptionDialog = null
-                }
+                hudProgressDialog = dialog
+                dialog.show()
             }
-
-            threeOptionDialog = alert.create()
-            threeOptionDialog?.show()
         }
     }
 }
