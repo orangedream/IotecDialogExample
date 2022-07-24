@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Alert dialogs without xml"
+        android:text="Custom Dialogs"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,9 +40,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:onClick="openYesNoDialog"
-                    android:text="Yes/No Dialog"
-                    android:textSize="12sp"
+                    android:onClick="openCustomTextInputDialog"
+                    android:text="Custom text input Dialog"
+                    android:textSize="11sp"
+
                     tools:ignore="HardcodedText" />
 
                 <TextView
@@ -51,7 +52,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"/>
             </LinearLayout>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -60,9 +60,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:onClick="openTextInputDialog"
-                    android:text="Text input Dialog"
-                    android:textSize="12sp"
+                    android:onClick="openCheckLinkDialog"
+                    android:text="Check / Link Dialog"
+                    android:textSize="11sp"
                     tools:ignore="HardcodedText" />
 
                 <TextView
@@ -71,6 +71,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"/>
             </LinearLayout>
+
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -79,9 +81,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:onClick="openThreeOptionsDialog"
-                    android:text="Three options Dialog"
-                    android:textSize="12sp"
+                    android:onClick="clickSimplePasswordDialog"
+                    android:text="Simple Password Dialog"
+                    android:textSize="11sp"
                     tools:ignore="HardcodedText" />
 
                 <TextView

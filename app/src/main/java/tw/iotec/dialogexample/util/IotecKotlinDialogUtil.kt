@@ -1,159 +1,197 @@
 package tw.iotec.dialogexample.util
 
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.text.InputType
+import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.TextView
+import tw.iotec.dialogexample.R
+
 
 class IotecKotlinDialogUtil {
     companion object{
         //************************************************************************************
-        // OK/Cancel Dialog using AlertDialog
+        // OK/Cancel/text input TextDialog using custom xml
         //************************************************************************************
-        private var okCancelAlertDialog: AlertDialog? = null
+        private var customTextInputDialog: Dialog? = null
 
-        interface ConfirmDialogCallback {
-            fun onResult(isOK: Boolean)
+
+        interface CustomTextInputDialogCallback {
+            fun onCancel()
+            fun onTextInput(inputText: String?)
         }
 
-        fun launchOkCancelAlertDialog(
+        fun launchCustomTextInputDialog(
             context: Context,
-            title: String?,
-            message: String?,
+            title: String,
+            description: String?,
+            defaultText: String?,
+            hint : String?,
             okStr: String,
             cancelStr: String?,
-            callback: ConfirmDialogCallback
+            callback: CustomTextInputDialogCallback
         ) {
-            okCancelAlertDialog?.dismiss() // dismiss previous dialog if exists
+            customTextInputDialog?.dismiss()
 
-            val alert = AlertDialog.Builder(context)
-            alert.setTitle(title)
-            alert.setMessage(message)
+            customTextInputDialog = Dialog(context)
+            customTextInputDialog?.setCancelable(false)
+            customTextInputDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            customTextInputDialog?.setContentView(R.layout.iotec_custom_text_input_dialog)
 
-            alert.setPositiveButton(
-                okStr
-            ) { _, _ ->
-                callback.onResult(true)
-                okCancelAlertDialog?.dismiss()
-                okCancelAlertDialog = null
+            val tvTitle = customTextInputDialog?.findViewById<TextView>(R.id.tv_title)
+            tvTitle?.text = title
+
+            val tvDesc = customTextInputDialog?.findViewById<TextView>(R.id.tv_desc)
+            description?.let{tvDesc?.setText(it)}
+
+            val etInput = customTextInputDialog?.findViewById<EditText>(R.id.et_input)
+            defaultText?.let { etInput?.setText(it) }
+            if (hint != null) {
+                etInput?.hint = hint
+            }else{
+                etInput?.hint = ""
             }
 
-            if(cancelStr != null) {
-                alert.setNegativeButton(
-                    cancelStr
-                ) { _, _ ->
-                    callback.onResult(false)
-                    okCancelAlertDialog?.dismiss()
-                    okCancelAlertDialog = null
+            val tvCancel = customTextInputDialog?.findViewById<TextView>(R.id.tv_cancel)
+            tvCancel?.text = cancelStr
+            tvCancel?.setOnClickListener {
+                callback.onCancel()
+                customTextInputDialog?.dismiss()
+                customTextInputDialog= null
+            }
+
+            val tvOK = customTextInputDialog?.findViewById<TextView>(R.id.tv_ok)
+            tvOK?.text = okStr
+            tvOK?.setOnClickListener {
+                callback.onTextInput(etInput?.text.toString())
+                customTextInputDialog?.dismiss()
+                customTextInputDialog= null
+            }
+
+            customTextInputDialog?.show()
+        }
+
+        //************************************************************************************
+        // Checkbox with message, link button, and OK/Cancel Dialog using Dialog with xml
+        //************************************************************************************
+        private var checkboxOkCancelDialog: Dialog? = null
+        interface LinkOkCancelDialogCallback {
+            fun onClickLink()
+            fun onClickOK()
+            fun onClickCancel()
+        }
+
+        fun launchCheckboxLinkOkCancelDialog(
+            context: Context,
+            title: String,
+            message: String?,
+            linkMessage: String?,
+            okStr: String,
+            cancelStr: String?,
+            callback: LinkOkCancelDialogCallback
+        ) {
+            checkboxOkCancelDialog?.dismiss()
+
+            checkboxOkCancelDialog = Dialog(context)
+            checkboxOkCancelDialog?.setCancelable(false)
+            checkboxOkCancelDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            checkboxOkCancelDialog?.setContentView(R.layout.iotec_dialog_check_link_ok_cancel)
+            val tvTitle: TextView?  = checkboxOkCancelDialog?.findViewById(R.id.tv_title)
+            tvTitle?.text = title
+
+            if(message!=null) {
+                val tvMessage: TextView? = checkboxOkCancelDialog?.findViewById(R.id.tv_message)
+                tvMessage?.text = message
+            }
+
+            val tvLink: TextView? = checkboxOkCancelDialog?.findViewById(R.id.tv_link)
+            if(linkMessage != null) {
+                tvLink?.text = linkMessage
+            }
+
+            val tvOK: TextView? = checkboxOkCancelDialog?.findViewById(R.id.tv_ok)
+            tvOK?.text = okStr
+
+            val tvCancel: TextView? = checkboxOkCancelDialog?.findViewById(R.id.tv_cancel)
+            if(cancelStr!=null) {
+                tvCancel?.text = cancelStr
+            }
+
+            val cbCheckbox: CheckBox? = checkboxOkCancelDialog?.findViewById(R.id.checkbox)
+
+            tvLink?.setOnClickListener {
+                callback.onClickLink()
+                checkboxOkCancelDialog?.dismiss()
+                checkboxOkCancelDialog = null
+            }
+            tvCancel?.setOnClickListener {
+                callback.onClickCancel()
+                checkboxOkCancelDialog?.dismiss()
+                checkboxOkCancelDialog = null
+            }
+            tvOK?.setOnClickListener {
+                if (cbCheckbox?.isChecked == true) {
+                    callback.onClickOK()
+                    checkboxOkCancelDialog?.dismiss()
+                    checkboxOkCancelDialog = null
                 }
             }
+            checkboxOkCancelDialog?.show()
+        }
+        //************************************************************************************
+        // Simple Password Dialog
+        // Simple dialog for input password
+        //************************************************************************************
+        var pwdDialog: AlertDialog? = null
 
-            okCancelAlertDialog = alert.create()
-            alert.show()
+        enum class PasswordType {
+            NumberPassword, TextPassword, VisiblePassword, WebPassword
         }
 
-        //************************************************************************************
-        // OK/Cancel/text input TextDialog using AlertDialog
-        //************************************************************************************
-        private var textInputDialog: AlertDialog? = null
-
-
-        interface TextDialogCallback {
-            fun onTextInput(isOK: Boolean, inputText: String?)
+        interface PasswordDialogCallback {
+            fun onPasswordInput(password: String?)
+            fun onPasswordInputCanceled()
         }
 
-        fun launchTextInputDialog(
-            context: Context,
+        fun launchSimplePasswordDialog(
+            context: Context?,
+            passwordType: PasswordType?,
             title: String?,
-            defaultMessage: String?,
-            hint:String?,
-            okStr: String,
+            okStr: String?,
             cancelStr: String?,
-            callback: TextDialogCallback
+            callback: PasswordDialogCallback
         ) {
-            textInputDialog?.dismiss()
-
-            val alert = AlertDialog.Builder(context)
-            alert.setTitle(title)
-
+            val alert: AlertDialog.Builder = AlertDialog.Builder(context)
             val edittext = EditText(context)
-            edittext.setText(defaultMessage)
-            edittext.hint = hint
+            edittext.inputType = when (passwordType) {
+                PasswordType.WebPassword -> InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD
+                PasswordType.TextPassword -> InputType.TYPE_TEXT_VARIATION_PASSWORD
+                PasswordType.NumberPassword -> InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                PasswordType.VisiblePassword -> InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                else -> InputType.TYPE_TEXT_VARIATION_PASSWORD
+            }
+            alert.setTitle(title)
             alert.setView(edittext)
-
             alert.setPositiveButton(okStr
             ) { _, _ ->
-                val inputText = edittext.text.toString()
-                callback.onTextInput(true, inputText)
-                textInputDialog?.dismiss()
-                textInputDialog = null
+                val password = edittext.text.toString()
+                callback.onPasswordInput(password)
+                pwdDialog?.dismiss()
+                pwdDialog = null
             }
-            if (cancelStr != null) {
-                alert.setNegativeButton(cancelStr
-                ) { _, _ ->
-                    callback.onTextInput(false, null)
-                    textInputDialog?.dismiss()
-                    textInputDialog = null
-                }
-            }
-            textInputDialog = alert.create()
-            textInputDialog?.show()
-        }
-
-        //************************************************************************************
-        // Three options dialog using AlertDialog
-        //************************************************************************************
-        private var threeOptionDialog: AlertDialog? = null
-        enum class ThreeOptionsDialogSelection {
-            OPTION1, OPTION2, OPTION3
-        }
-
-        interface ThreeOptionDialogCallback {
-            fun onResult(option: ThreeOptionsDialogSelection)
-        }
-
-        fun launchThreeOptionDialog(
-            context: Context,
-            title: String?,
-            message: String?,
-            option1: String,
-            option2: String?,
-            option3: String?, callback: ThreeOptionDialogCallback
-        ) {
-            threeOptionDialog?.dismiss()
-
-            val alert = AlertDialog.Builder(context)
-            alert.setTitle(title)
-            if (message != null) alert.setMessage(message)
-            alert.setPositiveButton(
-                option1
+            alert.setNegativeButton(cancelStr
             ) { _, _ ->
-                callback.onResult(ThreeOptionsDialogSelection.OPTION1)
-                threeOptionDialog?.dismiss()
-                threeOptionDialog = null
+                callback.onPasswordInputCanceled()
+                pwdDialog?.dismiss()
+                pwdDialog = null
             }
-
-            if(option2 != null) {
-                alert.setNegativeButton(
-                    option2
-                ) { _, _ ->
-                    callback.onResult(ThreeOptionsDialogSelection.OPTION2)
-                    threeOptionDialog?.dismiss()
-                    threeOptionDialog = null
-                }
-            }
-
-            if(option3 != null) {
-                alert.setNeutralButton(
-                    option3
-                ) { _, _ ->
-                    callback.onResult(ThreeOptionsDialogSelection.OPTION3)
-                    threeOptionDialog?.dismiss()
-                    threeOptionDialog = null
-                }
-            }
-
-            threeOptionDialog = alert.create()
-            threeOptionDialog?.show()
+            pwdDialog = alert.create()
+            pwdDialog?.show()
         }
     }
 }
